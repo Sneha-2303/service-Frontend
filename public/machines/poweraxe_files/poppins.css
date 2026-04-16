@@ -1,0 +1,19 @@
+html, body, p, h1, h2, h3, h4, h5, h6, div, span, button, strong, tr, td, th, input, textarea, label, select {
+font-family: 'Poppins-Regular'; 
+}
+
+@font-face {
+	font-family: 'Poppins-Regular';
+	src: url('../fonts/poppins/Poppins-Regular.eot');
+	src: local('☺'), url('../fonts/poppins/Poppins-Regular.woff') format('woff'), url('../fonts/poppins/Poppins-Regular.ttf') format('truetype'), url('../fonts/poppins/Poppins-Regular.svg') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Poppins', sans-serif;
+	src: url('../fonts/poppins/Poppins-Regular.eot');
+	src: local('☺'), url('../fonts/poppins/Poppins-Regular.woff') format('woff'), url('../fonts/poppins/Poppins-Regular.ttf') format('truetype'), url('../fonts/poppins/Poppins-Regular.svg') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
