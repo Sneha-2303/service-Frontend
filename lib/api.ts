@@ -22,13 +22,18 @@ export const clearTokens = () => {
 const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<any> => {
   const token = getAuthToken();
   
-  const headers: HeadersInit = {
+  const headers = new Headers({
     'Content-Type': 'application/json',
-    ...options.headers,
-  };
+  });
+  
+  if (options.headers) {
+    Object.entries(options.headers).forEach(([key, value]) => {
+      headers.set(key, value as string);
+    });
+  }
   
   if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+    headers.set('Authorization', `Bearer ${token}`);
   }
   
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -93,13 +98,19 @@ export const register = async (userData: {
 // User APIs
 export const getUsers = () => apiRequest('/admin/users');
 export const createUser = (userData: any) => apiRequest('/users', { method: 'POST', body: JSON.stringify(userData) });
-export const updateUser = (username: string, data: any) => apiRequest(`/users/${username}?email=${encodeURIComponent(data.email)}&full_name=${encodeURIComponent(data.full_name)}&role=${data.role}`, { method: 'PUT' });
-export const deleteUser = (username: string) => apiRequest(`/users/${username}`, { method: 'DELETE' });
+export const updateUser = (id: number, userData: any) => apiRequest(`/users/${id}`, { method: 'PUT', body: JSON.stringify(userData) });
+export const deleteUser = (id: number) => apiRequest(`/users/${id}`, { method: 'DELETE' });
+export const getCurrentUser = () => apiRequest('/users/me');
 
 // State, District, City APIs
 export const getStates = () => apiRequest('/states');
 export const getDistricts = (stateId: number) => apiRequest(`/districts/${stateId}`);
-export const getCities = (districtId: number) => apiRequest(`/cities/${districtId}`);
+export const getTalukas = () => apiRequest('/talukas');
+export const getTalukasByDistrict = (districtId: number) => apiRequest(`/talukas/${districtId}`);
+export const createTaluka = (data: any) => apiRequest('/talukas', { method: 'POST', body: JSON.stringify(data) });
+export const updateTaluka = (id: number, data: any) => apiRequest(`/talukas/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+export const deleteTaluka = (id: number) => apiRequest(`/talukas/${id}`, { method: 'DELETE' });
+export const getLocationHierarchy = () => apiRequest('/locations/hierarchy');
 
 // Machine APIs
 export const getMachines = () => apiRequest('/machines');
@@ -115,6 +126,9 @@ export const deleteDealer = (id: number) => apiRequest(`/dealers/${id}`, { metho
 
 // Customer APIs
 export const getCustomers = () => apiRequest('/customers');
+export const createCustomer = (data: any) => apiRequest('/customers', { method: 'POST', body: JSON.stringify(data) });
+export const updateCustomer = (id: number, data: any) => apiRequest(`/customers/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+export const deleteCustomer = (id: number) => apiRequest(`/customers/${id}`, { method: 'DELETE' });
 
 // Service Engineer APIs
 export const getServiceEngineers = () => apiRequest('/service-engineers');
@@ -124,4 +138,29 @@ export const getCustomerMachines = () => apiRequest('/customer-machines');
 export const createCustomerMachine = (data: any) => apiRequest('/customer-machines', { method: 'POST', body: JSON.stringify(data) });
 
 // Machine Model APIs
+export const getAllMachineModels = () => apiRequest('/machine-models');
 export const getMachineModels = (machineId: number) => apiRequest(`/machines/${machineId}/models`);
+
+// Complaint Category APIs
+export const getComplaintCategories = () => apiRequest('/complaint-categories');
+export const createComplaintCategory = (data: any) => apiRequest('/complaint-categories', { method: 'POST', body: JSON.stringify(data) });
+export const updateComplaintCategory = (id: number, data: any) => apiRequest(`/complaint-categories/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+export const deleteComplaintCategory = (id: number) => apiRequest(`/complaint-categories/${id}`, { method: 'DELETE' });
+
+// Complaint Subcategory APIs
+export const getComplaintSubcategories = () => apiRequest('/complaint-subcategories');
+export const getComplaintSubcategoriesByCategory = (categoryId: number) => apiRequest(`/complaint-subcategories/category/${categoryId}`);
+export const createComplaintSubcategory = (data: any) => apiRequest('/complaint-subcategories', { method: 'POST', body: JSON.stringify(data) });
+export const updateComplaintSubcategory = (id: number, data: any) => apiRequest(`/complaint-subcategories/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+export const deleteComplaintSubcategory = (id: number) => apiRequest(`/complaint-subcategories/${id}`, { method: 'DELETE' });
+
+// Complaint APIs
+export const getComplaints = () => apiRequest('/complaints');
+export const createComplaint = (data: any) => apiRequest('/complaints', { method: 'POST', body: JSON.stringify(data) });
+export const updateComplaintStatus = (id: number, status: string) => apiRequest(`/complaints/${id}/status?status=${status}`, { method: 'PUT' });
+
+// Part APIs
+export const getParts = () => apiRequest('/parts');
+export const createPart = (data: any) => apiRequest('/parts', { method: 'POST', body: JSON.stringify(data) });
+export const updatePart = (id: number, data: any) => apiRequest(`/parts/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+export const deletePart = (id: number) => apiRequest(`/parts/${id}`, { method: 'DELETE' });

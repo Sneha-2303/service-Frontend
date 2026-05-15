@@ -1,16 +1,7 @@
 "use client";
+import { useEffect, useState } from "react";
 
-const lowestMTTR = [
-  { name: "Ajit Gavandare",  mttr: -5, complaints: 1,   initials: "AG" },
-  { name: "Yogesh Kokate",   mttr: -5, complaints: 2,   initials: "YK" },
-  { name: "Akash Nawale",    mttr: -5, complaints: 3,   initials: "AN" },
-];
-
-const highestRating = [
-  { name: "Sandip Bhosale",  rating: 5, complaints: 33,  initials: "SB" },
-  { name: "Ankush Khandare", rating: 5, complaints: 335, initials: "AK" },
-  { name: "Mahesh Jadhav",   rating: 5, complaints: 548, initials: "MJ" },
-];
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 const medals = [
   { label: "1st", gradient: "linear-gradient(135deg, #f59e0b, #d97706)", ring: "#fde68a", shadow: "rgba(245,158,11,0.4)" },
@@ -39,7 +30,7 @@ function EngineerAvatar({ initials, idx }: { initials: string; idx: number }) {
   );
 }
 
-function MTTRCard({ e, idx }: { e: typeof lowestMTTR[0]; idx: number }) {
+function MTTRCard({ e, idx }: { e: any; idx: number }) {
   const m = medals[idx];
   return (
     <div className="flex items-center gap-4 p-4 rounded-2xl transition-all hover:shadow-md"
@@ -65,7 +56,7 @@ function MTTRCard({ e, idx }: { e: typeof lowestMTTR[0]; idx: number }) {
   );
 }
 
-function RatingCard({ e, idx }: { e: typeof highestRating[0]; idx: number }) {
+function RatingCard({ e, idx }: { e: any; idx: number }) {
   const m = medals[idx];
   return (
     <div className="flex items-center gap-4 p-4 rounded-2xl transition-all hover:shadow-md"
@@ -76,7 +67,7 @@ function RatingCard({ e, idx }: { e: typeof highestRating[0]; idx: number }) {
         <div className="flex items-center gap-2 mt-1.5 flex-wrap">
           <span className="text-xs font-bold px-2 py-0.5 rounded-full"
             style={{ background: "#fffbeb", color: "#92400e", border: "1px solid #fde68a" }}>
-            {"★".repeat(e.rating)} {e.rating}.0
+            {"★".repeat(e.rating || 5)} {(e.rating || 5)}.0
           </span>
           <span className="text-xs font-bold px-2 py-0.5 rounded-full"
             style={{ background: "#fdf2f8", color: "#701a75", border: "1px solid #f0abfc" }}>
@@ -92,6 +83,28 @@ function RatingCard({ e, idx }: { e: typeof highestRating[0]; idx: number }) {
 }
 
 export default function TopEngineers() {
+  const [data, setData] = useState<{ lowest_mttr: any[]; highest_rating: any[] }>({
+    lowest_mttr: [],
+    highest_rating: []
+  });
+
+  useEffect(() => {
+    const fetchTopEngineers = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/dashboard/top-engineers`);
+        if (res.ok) {
+          const result = await res.json();
+          setData(result);
+        }
+      } catch (error) {
+        console.error("Error fetching top engineers:", error);
+      }
+    };
+    fetchTopEngineers();
+  }, []);
+
+  const { lowest_mttr, highest_rating } = data;
+
   return (
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
 
@@ -111,8 +124,8 @@ export default function TopEngineers() {
         </div>
         {/* Cards */}
         <div className="p-5 space-y-3" style={{ background: "#fff" }}>
-          {lowestMTTR.map((e, i) => (
-            <MTTRCard key={e.name} e={e} idx={i} />
+          {lowest_mttr.map((e: any, i: number) => (
+            <MTTRCard key={e.name + i} e={e} idx={i} />
           ))}
         </div>
       </div>
@@ -133,8 +146,8 @@ export default function TopEngineers() {
         </div>
         {/* Cards */}
         <div className="p-5 space-y-3" style={{ background: "#fff" }}>
-          {highestRating.map((e, i) => (
-            <RatingCard key={e.name} e={e} idx={i} />
+          {highest_rating.map((e: any, i: number) => (
+            <RatingCard key={e.name + i} e={e} idx={i} />
           ))}
         </div>
       </div>

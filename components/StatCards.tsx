@@ -2,86 +2,13 @@
 
 import { Users, ClipboardList, AlertCircle, Wrench, Hammer, PauseCircle, CheckCircle } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-const stats = [
-  {
-    label: "Total Customers",
-    value: 15932,
-    icon: Users,
-    gradient: "from-emerald-500 to-teal-600",
-    iconBg: "bg-white/20",
-    iconColor: "text-white",
-    valueColor: "text-white",
-    labelColor: "text-white/80",
-    path: "/customer",
-  },
-  {
-    label: "Total Complaints",
-    value: 21124,
-    icon: ClipboardList,
-    gradient: "from-blue-500 to-indigo-600",
-    iconBg: "bg-white/20",
-    iconColor: "text-white",
-    valueColor: "text-white",
-    labelColor: "text-white/80",
-  },
-  {
-    label: "Today's Complaints",
-    value: 0,
-    icon: AlertCircle,
-    gradient: "from-red-500 to-rose-600",
-    iconBg: "bg-white/20",
-    iconColor: "text-white",
-    valueColor: "text-white",
-    labelColor: "text-white/80",
-  },
-  {
-    label: "Assigned to Engineer",
-    value: 291,
-    icon: Wrench,
-    gradient: "from-green-500 to-emerald-600",
-    iconBg: "bg-white/20",
-    iconColor: "text-white",
-    valueColor: "text-white",
-    labelColor: "text-white/80",
-  },
-  {
-    label: "Need Installation",
-    value: 2181,
-    icon: Hammer,
-    gradient: "from-orange-500 to-amber-600",
-    iconBg: "bg-white/20",
-    iconColor: "text-white",
-    valueColor: "text-white",
-    labelColor: "text-white/80",
-  },
-  {
-    label: "Hold Complaints",
-    value: 61,
-    icon: PauseCircle,
-    gradient: "from-purple-500 to-pink-600",
-    iconBg: "bg-white/20",
-    iconColor: "text-white",
-    valueColor: "text-white",
-    labelColor: "text-white/80",
-  },
-  {
-    label: "Closed Complaints",
-    value: 20833,
-    icon: CheckCircle,
-    gradient: "from-teal-500 to-cyan-600",
-    iconBg: "bg-white/20",
-    iconColor: "text-white",
-    valueColor: "text-white",
-    labelColor: "text-white/80",
-  },
-];
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 function AnimatedNumber({ target }: { target: number }) {
   const [count, setCount] = useState(0);
   useEffect(() => {
-    if (target === 0) return;
     const steps = 40;
     const increment = target / steps;
     let current = 0;
@@ -97,6 +24,113 @@ function AnimatedNumber({ target }: { target: number }) {
 
 export default function StatCards() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [statsData, setStatsData] = useState({
+    total_customers: 0,
+    total_complaints: 0,
+    today_complaints: 0,
+    assigned_to_engineer: 0,
+    need_installation: 0,
+    hold_complaints: 0,
+    closed_complaints: 0
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const query = searchParams.toString();
+        const res = await fetch(`${API_BASE}/dashboard/stats${query ? `?${query}` : ""}`);
+        if (res.ok) {
+          const data = await res.json();
+          setStatsData(data);
+        }
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      }
+    };
+    fetchStats();
+  }, [searchParams]);
+
+
+  const stats = [
+    {
+      label: "Total Customers",
+      value: statsData.total_customers,
+      icon: Users,
+      gradient: "from-emerald-500 to-teal-600",
+      iconBg: "bg-white/20",
+      iconColor: "text-white",
+      valueColor: "text-white",
+      labelColor: "text-white/80",
+      path: "/customer",
+    },
+    {
+      label: "Total Complaints",
+      value: statsData.total_complaints,
+      icon: ClipboardList,
+      gradient: "from-blue-500 to-indigo-600",
+      iconBg: "bg-white/20",
+      iconColor: "text-white",
+      valueColor: "text-white",
+      labelColor: "text-white/80",
+      path: "/complaint",
+    },
+    {
+      label: "Today's Complaints",
+      value: statsData.today_complaints,
+      icon: AlertCircle,
+      gradient: "from-red-500 to-rose-600",
+      iconBg: "bg-white/20",
+      iconColor: "text-white",
+      valueColor: "text-white",
+      labelColor: "text-white/80",
+      path: "/complaint?filter=today",
+    },
+    {
+      label: "Assigned to Engineer",
+      value: statsData.assigned_to_engineer,
+      icon: Wrench,
+      gradient: "from-green-500 to-emerald-600",
+      iconBg: "bg-white/20",
+      iconColor: "text-white",
+      valueColor: "text-white",
+      labelColor: "text-white/80",
+      path: "/complaint?status=Assigned",
+    },
+    {
+      label: "Need Installation",
+      value: statsData.need_installation,
+      icon: Hammer,
+      gradient: "from-orange-500 to-amber-600",
+      iconBg: "bg-white/20",
+      iconColor: "text-white",
+      valueColor: "text-white",
+      labelColor: "text-white/80",
+      path: "/complaint?status=Need%20Installation",
+    },
+    {
+      label: "Hold Complaints",
+      value: statsData.hold_complaints,
+      icon: PauseCircle,
+      gradient: "from-purple-500 to-pink-600",
+      iconBg: "bg-white/20",
+      iconColor: "text-white",
+      valueColor: "text-white",
+      labelColor: "text-white/80",
+      path: "/complaint?status=Hold",
+    },
+    {
+      label: "Closed Complaints",
+      value: statsData.closed_complaints,
+      icon: CheckCircle,
+      gradient: "from-teal-500 to-cyan-600",
+      iconBg: "bg-white/20",
+      iconColor: "text-white",
+      valueColor: "text-white",
+      labelColor: "text-white/80",
+      path: "/complaint?status=Closed",
+    },
+  ];
 
   const handleCardClick = (stat: any) => {
     if (stat.path) {
@@ -119,9 +153,9 @@ export default function StatCards() {
             </div>
             <div>
               <p className={`${stat.labelColor} text-xs font-medium leading-tight`}>{stat.label}</p>
-              <p className={`${stat.valueColor} text-2xl font-bold mt-1`}>
+              <div className={`${stat.valueColor} text-2xl font-bold mt-1`}>
                 <AnimatedNumber target={stat.value} />
-              </p>
+              </div>
             </div>
           </div>
         );

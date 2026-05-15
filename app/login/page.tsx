@@ -9,6 +9,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [tab, setTab] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -29,8 +30,7 @@ export default function LoginPage() {
   
   setLoading(true);
   try {
-    const response = await login(email, password);
-    localStorage.setItem("mitra_authed", "true");
+    await login(email, password);
     window.location.href = "/";
   } catch (err: any) {
     setError(err.message || "Invalid credentials. Please try again.");
@@ -44,7 +44,7 @@ export default function LoginPage() {
   setError("");
   setSuccess("");
   
-  if (!name || !email || !password || !phone) {
+  if (!name || !username || !email || !password || !phone) {
     setError("Please fill all fields.");
     return;
   }
@@ -52,7 +52,7 @@ export default function LoginPage() {
   setLoading(true);
   try {
     await register({
-      username: email.split('@')[0],
+      username: username,
       password: password,
       email: email,
       mobile: phone,
@@ -207,9 +207,9 @@ export default function LoginPage() {
           {tab === "login" && (
             <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
-                <label className="text-xs font-bold uppercase tracking-widest block mb-1.5" style={{ color: "#374151" }}>Email</label>
+                <label className="text-xs font-bold uppercase tracking-widest block mb-1.5" style={{ color: "#374151" }}>Username or Email</label>
                 <input 
-                  type="email" 
+                  type="text" 
                   value={email} 
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@mitra.com" 
@@ -283,6 +283,19 @@ export default function LoginPage() {
                   value={name} 
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Enter your full name" 
+                  style={inputStyle}
+                  onFocus={(e) => { e.target.style.borderColor = "#6366f1"; e.target.style.background = "#fff"; }}
+                  onBlur={(e)  => { e.target.style.borderColor = "#e0e7ff"; e.target.style.background = "#f8faff"; }} 
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold uppercase tracking-widest block mb-1.5" style={{ color: "#374151" }}>Username</label>
+                <input 
+                  type="text" 
+                  value={username} 
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Choose a unique username" 
                   style={inputStyle}
                   onFocus={(e) => { e.target.style.borderColor = "#6366f1"; e.target.style.background = "#fff"; }}
                   onBlur={(e)  => { e.target.style.borderColor = "#e0e7ff"; e.target.style.background = "#f8faff"; }} 
